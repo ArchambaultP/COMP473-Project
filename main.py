@@ -41,8 +41,8 @@ def main():
  
     mln = MLN(layers_dims, dropout_probs)
     mln.fit(train_x, train_y, learning_rate=0.1, n_iterations=1000)
-    print("Train Accuracy:", ann.predict(train_x, train_y))
-    print("Test Accuracy:", ann.predict(test_x, test_y))
+    print("Train Accuracy:", mln.predict(train_x, train_y))
+    print("Test Accuracy:", mln.predict(test_x, test_y))
     mln.plot_cost()
 
 def pre_process_data(train_x, train_y, test_x, test_y):
