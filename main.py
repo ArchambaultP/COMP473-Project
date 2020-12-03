@@ -4,6 +4,7 @@ from pathlib import Path
 import csv
 from functions import softmax
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 """
     Loads data from the datasets then analyzes the neural framework.
@@ -12,33 +13,24 @@ from sklearn.preprocessing import OneHotEncoder
 """
 
 def main():
-    mnist_path = Path('datasets/MNIST')
-    with open(mnist_path / "mnist_train.csv", 'r') as file:
+    iris_path = Path('datasets/IRIS')
+    with open(iris_path / "IRIS_train_test.csv", 'r') as file:
         X_data = []
         Y_data = []
         for img in csv.reader(file):
-            Y_data.append(img[0])
-            X_data.append(img[1:])
+            Y_data.append(img[5])
+            X_data.append(img[1:5])
 
-    X_train = np.array(X_data, dtype=int)
-    Y_train = np.array(Y_data, dtype=int)
-    Y_train = Y_train.reshape((Y_train.shape[0], 1))
-
-    with open(mnist_path / "mnist_test.csv", 'r') as file:
-        X_data = []
-        Y_data = []
-        for img in csv.reader(file):
-            Y_data.append(img[0])
-            X_data.append(img[1:])
-
-    X_test = np.array(X_data, dtype=int)
-    Y_test = np.array(Y_data, dtype=int)
+    X_train_test = np.array(X_data, dtype=float)
+    Y_train_test = np.array(Y_data, dtype=str)
+    Y_train_test = Y_train_test.reshape((Y_train_test.shape[0], 1))
+    X_train, X_test, Y_train, Y_test = train_test_split(X_train_test, Y_train_test, test_size=0.2, random_state=1)
 
     train_x, train_y, test_x, test_y = pre_process_data(X_train, Y_train, X_test, Y_test)
- 
-    layers_dims = [64, 32, 10] # Layer dimensions
+
+    layers_dims = [64, 32, 3] # Layer dimensions
     dropout_probs = [0.5, 0.5] # Chance to drop each node at Layer l. We exclude output layer from dropout.
- 
+
     mln = MLN(layers_dims, dropout_probs)
     mln.fit(train_x, train_y, learning_rate=0.1, n_iterations=1000)
     print("Train Accuracy:", mln.predict(train_x, train_y))
@@ -49,9 +41,8 @@ def pre_process_data(train_x, train_y, test_x, test_y):
     """
     Pre process MNIST data, may need to process other datasets differently
     """
-    train_x = train_x / 255.
-    test_x = test_x / 255.
- 
+    train_x = train_x
+    test_x = test_x
     enc = OneHotEncoder(sparse=False, categories='auto')
     train_y = enc.fit_transform(train_y.reshape(len(train_y), -1))
  
